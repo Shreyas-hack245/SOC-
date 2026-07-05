@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC-LAB — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="dash-shell">
+  <div class="dash-top">
+    <div class="dash-top-left">
+      <a href="index.html" class="mono" style="text-decoration:none; color:#fff;">SOC&#8209;LAB</a>
+      <span class="status-pill"><span class="p-dot"></span> Firewall Active</span>
+      <span class="status-pill"><span class="p-dot"></span> Snort Running</span>
+    </div>
+    <div class="dash-top-right">
+      <label>Role
+        <select class="role-select" id="roleSelect">
+          <option>Analyst</option>
+          <option>Admin</option>
+          <option>Viewer</option>
+        </select>
+      </label>
+      <span id="clock">00:00:00</span>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Live alert feed -->
+    <div class="panel" style="grid-row: span 2;">
+      <div class="panel-head">
+        <h4>Live Snort Alert Feed</h4>
+        <span class="tag" id="alertCount">0 alerts</span>
+      </div>
+      <div class="panel-body">
+        <div class="alert-feed" id="alertFeed"></div>
+      </div>
+    </div>
+
+    <!-- Quick stats + firewall chart -->
+    <div class="panel">
+      <div class="panel-head"><h4>Firewall Overview</h4><span class="tag">last 24h</span></div>
+      <div class="panel-body">
+        <div class="stat-mini-row">
+          <div class="stat-mini"><div class="n" id="statFiltered">100%</div><div class="l">ports filtered</div></div>
+          <div class="stat-mini"><div class="n" id="statBlocked">0</div><div class="l">requests blocked</div></div>
+          <div class="stat-mini"><div class="n" id="statOpen">2</div><div class="l">ports open</div></div>
+        </div>
+        <canvas id="firewallChart" height="140"></canvas>
+      </div>
+    </div>
+
+    <!-- Attack type bar chart -->
+    <div class="panel">
+      <div class="panel-head"><h4>Alerts by Attack Type</h4><span class="tag">live</span></div>
+      <div class="panel-body">
+        <canvas id="attackChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- MITRE heatmap -->
+    <div class="panel">
+      <div class="panel-head"><h4>MITRE ATT&amp;CK Coverage</h4><span class="tag">tactics observed</span></div>
+      <div class="panel-body">
+        <div class="mitre-grid" id="mitreGrid"></div>
+      </div>
+    </div>
+
+    <!-- System + RBAC -->
+    <div class="panel">
+      <div class="panel-head"><h4>System &amp; Access</h4><span class="tag" id="roleTag">role: analyst</span></div>
+      <div class="panel-body">
+        <div class="sys-list">
+          <div class="sys-item"><span class="name"><span class="d"></span>Firewall</span><span class="val">active · 100% filter rate</span></div>
+          <div class="sys-item"><span class="name"><span class="d"></span>Snort IDS</span><span class="val">running · rev 2.9</span></div>
+          <div class="sys-item"><span class="name"><span class="d"></span>Dashboard API</span><span class="val">streaming · 1.2s interval</span></div>
+          <div class="sys-item"><span class="name" id="rbacDot"><span class="d"></span>RBAC</span><span class="val" id="rbacVal">analyst · read-only alerts</span></div>
+        </div>
+        <p class="rbac-note" id="rbacNote">Analysts can view live alerts and MITRE mappings but cannot change firewall rules. Switch role above to see access change.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>
