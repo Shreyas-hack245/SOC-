@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC-LAB — Built it. Attacked it. Detected it.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <div class="nav-brand"><span class="dot"></span> SOC&#8209;LAB</div>
+    <div class="nav-links">
+      <a href="#sim">Attack Sim</a>
+      <a href="#defense">Defense Stack</a>
+      <a href="#results">Results</a>
+      <a href="#mitre">MITRE ATT&amp;CK</a>
+      <a href="#team">Team</a>
+    </div>
+    <a class="nav-cta" href="dashboard.html">Live Dashboard →</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Student-built · End-to-end lab</span>
+      <h1>We built it.<br>We attacked it.<br>We <span class="accent">detected</span> it.</h1>
+      <p class="lede">A full Security Operations Center built from scratch — firewall hardening, an IDS pipeline, and a live SOC dashboard — then stress-tested with real attack tooling from Kali Linux.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="dashboard.html">Open live dashboard</a>
+        <a class="btn btn-ghost" href="#sim">See the attack sim ↓</a>
+      </div>
+    </div>
+    <div class="scan-panel">
+      <div class="scan-panel-head">
+        <span>nmap_scan.sh — target: 10.0.0.0/24</span>
+        <span class="live">● live</span>
+      </div>
+      <canvas id="portScan"></canvas>
+      <div class="scan-panel-head" style="margin-top:10px; margin-bottom:0;">
+        <span style="color:var(--cyan)">■ blocked</span>
+        <span style="color:var(--amber)">■ scanning</span>
+        <span>■ open</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="sim">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">01</span>
+      <div>
+        <h2 class="section-title">What we simulated</h2>
+        <p class="section-sub">Three real attack classes, launched from Kali Linux against our own hardened network, to prove the defenses actually hold up under fire.</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card reveal">
+        <div class="card-tag">RECON</div>
+        <h3>Nmap port scans</h3>
+        <p>Full TCP/UDP sweeps across the subnet to fingerprint open services before any exploit attempt — the same first move a real attacker makes.</p>
+        <div class="card-meta"><span>Tool: nmap</span><span>Source: Kali</span></div>
+      </div>
+      <div class="card reveal">
+        <div class="card-tag">DISRUPTION</div>
+        <h3>SYN flood DoS</h3>
+        <p>High-volume half-open TCP connections aimed at exhausting the target's connection table and taking services offline.</p>
+        <div class="card-meta"><span>Tool: hping3</span><span>Vector: TCP/SYN</span></div>
+      </div>
+      <div class="card reveal">
+        <div class="card-tag">INTRUSION</div>
+        <h3>FTP / Telnet brute force</h3>
+        <p>Automated credential-stuffing attempts against legacy plaintext services to test account lockout and detection thresholds.</p>
+        <div class="card-meta"><span>Tool: Hydra</span><span>Target: FTP · Telnet</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="defense">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">02</span>
+      <div>
+        <h2 class="section-title">What stopped them</h2>
+        <p class="section-sub">Three layers working together — perimeter filtering, packet-level detection, and a dashboard tying it all into one picture.</p>
+      </div>
+    </div>
+    <div class="stack-row">
+      <div class="stack-item reveal">
+        <h3>Windows Defender Firewall</h3>
+        <p>Custom inbound/outbound rules built to close every port not explicitly required by the lab.</p>
+        <div class="stack-stat">100%<span>port filtering rate</span></div>
+      </div>
+      <div class="stack-item reveal">
+        <h3>Snort IDS</h3>
+        <p>Signature-based packet inspection tuned to catch scan patterns, floods, and brute-force attempts in real time.</p>
+        <div class="stack-stat">864<span>real alerts generated</span></div>
+      </div>
+      <div class="stack-item reveal">
+        <h3>Custom SOC Dashboard</h3>
+        <p>Python + Streamlit dashboard streaming the live Snort feed, with role-based access control and MITRE ATT&amp;CK mapping.</p>
+        <div class="stack-stat">RBAC<span>+ live alert feed</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">03</span>
+      <div>
+        <h2 class="section-title">Results</h2>
+        <p class="section-sub">Every simulated attack was filtered, logged, or both — and surfaced live on the dashboard.</p>
+      </div>
+    </div>
+    <div class="stat-bar reveal">
+      <div class="stat"><div class="num cyan" data-count="100" data-suffix="%">0%</div><div class="label">ports filtered by firewall</div></div>
+      <div class="stat"><div class="num amber" data-count="864">0</div><div class="label">Snort alerts generated</div></div>
+      <div class="stat"><div class="num" data-count="3">0</div><div class="label">attack classes simulated</div></div>
+      <div class="stat"><div class="num" data-count="4">0</div><div class="label">MITRE tactics mapped</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="mitre">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">04</span>
+      <div>
+        <h2 class="section-title">MITRE ATT&amp;CK mapping</h2>
+        <p class="section-sub">Every alert on the dashboard is tagged back to a tactic, so analysts see intent — not just noise.</p>
+      </div>
+    </div>
+    <div class="mitre-row reveal">
+      <span class="mitre-tag"><b>TA0043</b> Reconnaissance</span>
+      <span class="mitre-tag"><b>TA0006</b> Credential Access</span>
+      <span class="mitre-tag"><b>TA0040</b> Impact</span>
+      <span class="mitre-tag"><b>TA0011</b> Command &amp; Control</span>
+      <span class="mitre-tag"><b>T1046</b> Network Scanning</span>
+      <span class="mitre-tag"><b>T1110</b> Brute Force</span>
+      <span class="mitre-tag"><b>T1499</b> Endpoint DoS</span>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-num">05</span>
+      <div>
+        <h2 class="section-title">Team</h2>
+        <p class="section-sub">Built collaboratively, end to end — network config to dashboard UI.</p>
+      </div>
+    </div>
+    <div class="team-grid reveal">
+      <div class="team-card"><div class="team-avatar">MA</div><div class="name">Malik Abubakar</div><div class="role">SOC / Network</div></div>
+      <div class="team-card"><div class="team-avatar">HB</div><div class="name">Hafiz Bilal Zia</div><div class="role">IDS / Snort</div></div>
+      <div class="team-card"><div class="team-avatar">SI</div><div class="name">Saad Iftikhar</div><div class="role">Firewall</div></div>
+      <div class="team-card"><div class="team-avatar">MA</div><div class="name">Mirza Abdullah Baig</div><div class="role">Dashboard</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>SOC-LAB · built for coursework, not production networks</span>
+    <div class="foot-tags">
+      <span>#Cybersecurity</span><span>#SnortIDS</span><span>#SOC</span><span>#MITRE</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
