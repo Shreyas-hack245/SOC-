@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOC-LAB — Dashboard</title>
+<title>SOC-LAB — Autonomous AI Security Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -12,78 +12,275 @@
 <body>
 
 <div class="dash-shell">
+  <!-- Top Bar -->
   <div class="dash-top">
     <div class="dash-top-left">
       <a href="index.html" class="mono" style="text-decoration:none; color:#fff;">SOC&#8209;LAB</a>
-      <span class="status-pill"><span class="p-dot"></span> Firewall Active</span>
-      <span class="status-pill"><span class="p-dot"></span> Snort Running</span>
+      <span class="status-pill" id="globalStatus"><span class="p-dot"></span> Firewall &amp; Agent Guard Active</span>
     </div>
     <div class="dash-top-right">
-      <label>Role
+      <label>Analyst Role:
         <select class="role-select" id="roleSelect">
-          <option>Analyst</option>
-          <option>Admin</option>
-          <option>Viewer</option>
+          <option value="Analyst">Analyst</option>
+          <option value="Admin">SecOps Admin</option>
+          <option value="Viewer">Guest Viewer</option>
         </select>
       </label>
       <span id="clock">00:00:00</span>
     </div>
   </div>
 
+  <!-- Main Grid Dashboard -->
   <div class="dash-grid">
-    <!-- Live alert feed -->
-    <div class="panel" style="grid-row: span 2;">
+    
+    <!-- LEFT COLUMN: AI Agent Monitor & Response Console -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- AI Agent Profile & State -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Agent Monitor</h4>
+          <span class="tag">Active</span>
+        </div>
+        <div class="panel-body">
+          <div class="agent-profile">
+            <div class="agent-avatar">
+              <div class="pulse-ring"></div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-10 10v7a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-7a10 10 0 0 0-10-10z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </div>
+            <div class="agent-info">
+              <span class="name">AegisSentinel-v1.8</span>
+              <span class="status" id="agentState"><span class="p-dot"></span> MONITORING</span>
+            </div>
+          </div>
+          <div class="agent-stats">
+            <div class="agent-stat-box">
+              <div class="lbl">EPS Rate</div>
+              <div class="val" id="agentEps">12.4 /s</div>
+            </div>
+            <div class="agent-stat-box">
+              <div class="lbl">Memory load</div>
+              <div class="val" id="agentMem">2.1%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Agent Reasoning Terminal Console -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Agent Reasoning Feed</h4>
+          <span class="tag">Terminal</span>
+        </div>
+        <div class="panel-body" style="padding: 12px 14px;">
+          <div class="agent-console" id="agentConsole">
+            <div class="console-line system">[SYSTEM] Autonomous Aegis Guard initialized successfully. Listening on interface eth0...</div>
+            <div class="console-line system">[SYSTEM] Snort IDS pipeline mapped. Threat database loaded (2.4k rulesets).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Automated Response Playbooks -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Incident Playbooks</h4>
+          <span class="tag">Policies</span>
+        </div>
+        <div class="panel-body">
+          <div class="playbooks-list" id="playbooksList">
+            <div class="playbook-item">
+              <div class="playbook-name">
+                <span>Quarantine Endpoint</span>
+                <span class="desc">Isolate target using iptables</span>
+              </div>
+              <span class="playbook-status idle" id="pb-quarantine">Idle</span>
+            </div>
+            <div class="playbook-item">
+              <div class="playbook-name">
+                <span>Block Attacker IP</span>
+                <span class="desc">Inject rule into edge firewall</span>
+              </div>
+              <span class="playbook-status idle" id="pb-blockip">Idle</span>
+            </div>
+            <div class="playbook-item">
+              <div class="playbook-name">
+                <span>Revoke AD Credentials</span>
+                <span class="desc">Force lock target LDAP account</span>
+              </div>
+              <span class="playbook-status idle" id="pb-revoke">Idle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CENTER COLUMN: Security Alert Feed -->
+    <div class="panel" style="align-self: stretch;">
       <div class="panel-head">
-        <h4>Live Snort Alert Feed</h4>
+        <h4>Intrusion Alerts &amp; Telemetry Feed</h4>
         <span class="tag" id="alertCount">0 alerts</span>
       </div>
-      <div class="panel-body">
+      <div class="alert-container">
+        <!-- Table headers -->
+        <div class="alert-header-row">
+          <span>Timestamp</span>
+          <span>Severity</span>
+          <span>Source IP</span>
+          <span>Alert Signature</span>
+          <span>Agent Status</span>
+        </div>
+        <!-- Scrollable alert list -->
         <div class="alert-feed" id="alertFeed"></div>
       </div>
     </div>
 
-    <!-- Quick stats + firewall chart -->
-    <div class="panel">
-      <div class="panel-head"><h4>Firewall Overview</h4><span class="tag">last 24h</span></div>
-      <div class="panel-body">
-        <div class="stat-mini-row">
-          <div class="stat-mini"><div class="n" id="statFiltered">100%</div><div class="l">ports filtered</div></div>
-          <div class="stat-mini"><div class="n" id="statBlocked">0</div><div class="l">requests blocked</div></div>
-          <div class="stat-mini"><div class="n" id="statOpen">2</div><div class="l">ports open</div></div>
+    <!-- RIGHT COLUMN: Graphs, MITRE ATT&CK Matrix & Settings -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Metrics Overview -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Firewall Overview</h4>
+          <span class="tag">Last 24h</span>
         </div>
-        <canvas id="firewallChart" height="140"></canvas>
-      </div>
-    </div>
-
-    <!-- Attack type bar chart -->
-    <div class="panel">
-      <div class="panel-head"><h4>Alerts by Attack Type</h4><span class="tag">live</span></div>
-      <div class="panel-body">
-        <canvas id="attackChart" height="160"></canvas>
-      </div>
-    </div>
-
-    <!-- MITRE heatmap -->
-    <div class="panel">
-      <div class="panel-head"><h4>MITRE ATT&amp;CK Coverage</h4><span class="tag">tactics observed</span></div>
-      <div class="panel-body">
-        <div class="mitre-grid" id="mitreGrid"></div>
-      </div>
-    </div>
-
-    <!-- System + RBAC -->
-    <div class="panel">
-      <div class="panel-head"><h4>System &amp; Access</h4><span class="tag" id="roleTag">role: analyst</span></div>
-      <div class="panel-body">
-        <div class="sys-list">
-          <div class="sys-item"><span class="name"><span class="d"></span>Firewall</span><span class="val">active · 100% filter rate</span></div>
-          <div class="sys-item"><span class="name"><span class="d"></span>Snort IDS</span><span class="val">running · rev 2.9</span></div>
-          <div class="sys-item"><span class="name"><span class="d"></span>Dashboard API</span><span class="val">streaming · 1.2s interval</span></div>
-          <div class="sys-item"><span class="name" id="rbacDot"><span class="d"></span>RBAC</span><span class="val" id="rbacVal">analyst · read-only alerts</span></div>
+        <div class="panel-body">
+          <div class="stat-mini-row">
+            <div class="stat-mini"><div class="n" id="statFiltered">100%</div><div class="l">filtered ports</div></div>
+            <div class="stat-mini"><div class="n" id="statBlocked">0</div><div class="l">blocks injected</div></div>
+            <div class="stat-mini"><div class="n" id="statOpen">2</div><div class="l">open ports</div></div>
+          </div>
+          <div style="display: flex; gap: 20px; align-items: center; justify-content: center; padding-top: 10px;">
+            <div style="width: 100px; height: 100px;">
+              <canvas id="firewallChart"></canvas>
+            </div>
+            <div style="flex: 1;">
+              <canvas id="attackChart" height="100"></canvas>
+            </div>
+          </div>
         </div>
-        <p class="rbac-note" id="rbacNote">Analysts can view live alerts and MITRE mappings but cannot change firewall rules. Switch role above to see access change.</p>
+      </div>
+
+      <!-- MITRE ATT&CK Matrix Heatmap -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>MITRE ATT&amp;CK Heatmap</h4>
+          <span class="tag">TTPs</span>
+        </div>
+        <div class="panel-body">
+          <div class="mitre-grid" id="mitreGrid"></div>
+        </div>
+      </div>
+
+      <!-- System & RBAC Integration -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4>System Integration</h4>
+          <span class="tag" id="roleTag">role: analyst</span>
+        </div>
+        <div class="panel-body">
+          <div class="sys-list">
+            <div class="sys-item"><span class="name"><span class="d"></span>Firewall Daemon</span><span class="val">active · 100% filter</span></div>
+            <div class="sys-item"><span class="name"><span class="d"></span>Snort IDS Pipeline</span><span class="val">running · PID 3091</span></div>
+            <div class="sys-item"><span class="name" id="rbacDot"><span class="d"></span>RBAC Settings</span><span class="val" id="rbacVal">analyst · read-only alerts</span></div>
+          </div>
+          <p class="rbac-note" id="rbacNote">Analysts can view live alerts and MITRE mappings but cannot change firewall rules. Switch role above to see access change.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Backdrop Overlay for Forensic Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+<!-- FORENSIC INVESTIGATION DRAWER (SLIDE-OUT) -->
+<div class="forensic-drawer" id="forensicDrawer">
+  <div class="drawer-head">
+    <h3 id="drawerTitle">Forensic Packet Analysis</h3>
+    <button class="close-btn" id="drawerClose">&times;</button>
+  </div>
+  <div class="drawer-body">
+    
+    <!-- Quick Fields -->
+    <div class="forensic-grid">
+      <div class="forensic-field">
+        <span class="lbl">Source IP</span>
+        <span class="val" id="fd-src">10.0.0.1</span>
+      </div>
+      <div class="forensic-field">
+        <span class="lbl">Destination IP</span>
+        <span class="val" id="fd-dst">10.0.0.5</span>
+      </div>
+      <div class="forensic-field">
+        <span class="lbl">Protocol</span>
+        <span class="val" id="fd-proto">TCP</span>
+      </div>
+      <div class="forensic-field">
+        <span class="lbl">Impact Score</span>
+        <span class="val" id="fd-score">9.2 / 10</span>
       </div>
     </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-hair); margin: 4px 0;">
+
+    <!-- Investigation Tabs -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="btn-tab-ai" onclick="switchDrawerTab('tab-ai')">AI Analysis</button>
+      <button class="tab-btn" id="btn-tab-pcap" onclick="switchDrawerTab('tab-pcap')">Raw Payload</button>
+      <button class="tab-btn" id="btn-tab-mitigation" onclick="switchDrawerTab('tab-mitigation')">Playbook Commands</button>
+    </div>
+
+    <!-- Tab 1: AI Agent Analysis -->
+    <div class="tab-content active" id="tab-ai">
+      <div class="forensic-section">
+        <h5>AI Assessment Summary</h5>
+        <div class="forensic-data-card" id="fd-ai-summary">
+          Analyzing threat details...
+        </div>
+      </div>
+      <div class="forensic-section" style="margin-top: 14px;">
+        <h5>Agent Chain-of-Thought</h5>
+        <div class="forensic-data-card mono" id="fd-ai-cot" style="font-size: 11px;">
+          Evaluating indicators...
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Raw Hex/Text Packet Payload -->
+    <div class="tab-content" id="tab-pcap">
+      <div class="forensic-section">
+        <h5>Log Snippet / HTTP Request</h5>
+        <div class="forensic-data-card mono" id="fd-log" style="overflow-x: auto; white-space: pre;">
+          HTTP log content goes here...
+        </div>
+      </div>
+      <div class="forensic-section" style="margin-top: 14px;">
+        <h5>Hex Dump</h5>
+        <div class="forensic-data-card mono" id="fd-hex" style="font-size: 11px; white-space: pre; overflow-x: auto; color: var(--cyan);">
+          Hex dump goes here...
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Mitigation logs / Playbook Script executed -->
+    <div class="tab-content" id="tab-mitigation">
+      <div class="forensic-section">
+        <h5>Response Status</h5>
+        <div class="forensic-data-card" id="fd-mit-status">
+          Autonomous firewall isolation executed successfully.
+        </div>
+      </div>
+      <div class="forensic-section" style="margin-top: 14px;">
+        <h5>Executed Script Command</h5>
+        <div class="forensic-data-card mono" id="fd-mit-command" style="font-size: 11.5px; color: var(--amber);">
+          bash block_attacker.sh -ip 10.0.0.1
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
