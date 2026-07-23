@@ -1,0 +1,9 @@
+{
+  "name": "soc-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive SOC Lab dashboard with a zero-dependency local API.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
